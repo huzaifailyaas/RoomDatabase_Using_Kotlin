@@ -20,11 +20,14 @@ import com.example.roomdatabase.R
 import com.example.roomdatabase.listAdapter
 import com.example.roomdatabase.viewmodel.UserViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.appcompat.widget.SearchView
 
 @Suppress("DEPRECATION")
 class ListFragment : Fragment() {
 
     private lateinit var mUserViewModel: UserViewModel
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: listAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,10 +36,11 @@ class ListFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_list, container, false)
 
-        val adapter = listAdapter()
-        val RecyclerView = view.findViewById<RecyclerView>(R.id.recycleview)
-        RecyclerView.adapter = adapter
-        RecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        // Initialize RecyclerView and Adapter
+        recyclerView = view.findViewById(R.id.recycleview)
+        adapter = listAdapter()
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         mUserViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
         mUserViewModel.readAllData.observe(viewLifecycleOwner, Observer { user ->
@@ -44,8 +48,7 @@ class ListFragment : Fragment() {
         })
 
         // Find the FloatingActionButton and set an onClickListener
-        val floatingActionButton =
-            view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
+        val floatingActionButton = view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
         floatingActionButton.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_addFragment)
         }
@@ -57,13 +60,37 @@ class ListFragment : Fragment() {
     @SuppressLint("ResourceType")
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.id.menu_delete, menu)
+        inflater.inflate(R.menu.search_menu, menu) // Inflate search_menu.xml
+
+        val searchItem = menu.findItem(R.id.menu_search)
+        val searchView = searchItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (query != null) {
+                    mUserViewModel.searchDatabase("%$query%").observe(viewLifecycleOwner, Observer { user ->
+                        adapter.setData(user)
+                    })
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null) {
+                    mUserViewModel.searchDatabase("%$newText%").observe(viewLifecycleOwner, Observer { user ->
+                        adapter.setData(user)
+                    })
+                }
+                return true
+            }
+        })
     }
 
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId== R.id.menu_delete){
+        if (item.itemId == R.id.menu_delete) {
             deleteAllUsers()
+            return true
         }
         return super.onOptionsItemSelected(item)
     }
@@ -77,7 +104,6 @@ class ListFragment : Fragment() {
                 "Successfully removed everything",
                 Toast.LENGTH_SHORT
             ).show()
-
         }
         builder.setNegativeButton("No") { _, _ -> }
         builder.setMessage("Are you sure you wanna delete everything")

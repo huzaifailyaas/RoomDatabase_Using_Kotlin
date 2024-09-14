@@ -15,14 +15,17 @@ interface StudentDao {
     fun addStudent(studentTable: StudentTable)
 
     @Update
-    suspend fun updateUser(user:StudentTable)
+    suspend fun updateUser(user: StudentTable)
 
     @Delete
     suspend fun deleteUser(user: StudentTable)
 
-    @Delete
+    @Query("DELETE FROM StudentTable") // Changed to @Query for deleting all records
     suspend fun deleteAllUsers()
 
     @Query("SELECT * FROM StudentTable ORDER BY id ASC")
-    fun readAllData():LiveData<List<StudentTable>>
+    fun readAllData(): LiveData<List<StudentTable>>
+
+    @Query("SELECT * FROM StudentTable WHERE firstname LIKE :searchQuery OR lastname LIKE :searchQuery")
+    fun searchDatabase(searchQuery: String): LiveData<List<StudentTable>>
 }

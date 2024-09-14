@@ -10,38 +10,41 @@ import com.example.roomdatabase.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class UserViewModel(application: Application):AndroidViewModel(application) {
-
-    var  readAllData: LiveData<List<StudentTable>>
-    private  var repository: UserRepository
+class UserViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository: UserRepository
+    val readAllData: LiveData<List<StudentTable>>
 
     init {
-        val studentDao= StudentDB.getDB(application).studentDao()
-        repository= UserRepository(studentDao)
-        readAllData=repository.readAllData
+        val studentDao = StudentDB.getDB(application).studentDao()
+        repository = UserRepository(studentDao)
+        readAllData = repository.readAllData
     }
 
-    fun addUser(studentTable: StudentTable){
-        viewModelScope.launch(Dispatchers.IO){
+    fun addUser(studentTable: StudentTable) {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.addUser(studentTable)
         }
     }
 
-    fun updateUser(user:StudentTable){
-        viewModelScope.launch (Dispatchers.IO){
+    fun updateUser(user: StudentTable) {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.updateUser(user)
         }
     }
 
-    fun deleteUser(user: StudentTable){
-        viewModelScope.launch (Dispatchers.IO){
+    fun deleteUser(user: StudentTable) {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteUser(user)
         }
     }
 
-    fun deleteAllUsers(){
-        viewModelScope.launch (Dispatchers.IO){
+    fun deleteAllUsers() {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAllUsers()
         }
+    }
+
+    fun searchDatabase(searchQuery: String): LiveData<List<StudentTable>> {
+        return repository.searchDatabase(searchQuery)
     }
 }

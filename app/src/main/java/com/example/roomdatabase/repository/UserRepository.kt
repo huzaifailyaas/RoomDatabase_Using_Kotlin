@@ -8,19 +8,23 @@ class UserRepository(private val studentDao: StudentDao) {
 
     val readAllData: LiveData<List<StudentTable>> = studentDao.readAllData()
 
-    suspend fun addUser(studentTable: StudentTable) {
+     fun addUser(studentTable: StudentTable) {
         studentDao.addStudent(studentTable)
     }
 
     suspend fun updateUser(user: StudentTable) {
-        studentDao.updateUser(user) // Use the instance variable
+        studentDao.updateUser(user)
     }
 
-    suspend fun deleteUser(user: StudentTable){
+    suspend fun deleteUser(user: StudentTable) {
         studentDao.deleteUser(user)
     }
 
-    suspend fun deleteAllUsers(){
-        studentDao.deleteAllUsers()
+    suspend fun deleteAllUsers() {
+        studentDao.deleteAllUsers() // This should now be correct
+    }
+
+    fun searchDatabase(searchQuery: String): LiveData<List<StudentTable>> {
+        return studentDao.searchDatabase(searchQuery)
     }
 }
