@@ -62,13 +62,17 @@ class ListFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.search_menu, menu) // Inflate search_menu.xml
 
+        // Inflate the delete menu
+        inflater.inflate(R.menu.delete_menu, menu)
+
+
         val searchItem = menu.findItem(R.id.menu_search)
         val searchView = searchItem.actionView as SearchView
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null) {
-                    mUserViewModel.searchDatabase("%$query%").observe(viewLifecycleOwner, Observer { user ->
+                query?.let {
+                    mUserViewModel.searchDatabase("%$it%").observe(viewLifecycleOwner, Observer { user ->
                         adapter.setData(user)
                     })
                 }
@@ -76,8 +80,8 @@ class ListFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null) {
-                    mUserViewModel.searchDatabase("%$newText%").observe(viewLifecycleOwner, Observer { user ->
+                newText?.let {
+                    mUserViewModel.searchDatabase("%$it%").observe(viewLifecycleOwner, Observer { user ->
                         adapter.setData(user)
                     })
                 }
@@ -88,11 +92,13 @@ class ListFragment : Fragment() {
 
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_delete) {
-            deleteAllUsers()
-            return true
+        return when (item.itemId) {
+            R.id.menu_delete -> {
+                deleteAllUsers()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun deleteAllUsers() {

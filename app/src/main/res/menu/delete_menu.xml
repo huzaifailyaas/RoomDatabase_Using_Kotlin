@@ -7,5 +7,5 @@
         android:title="Delete"
         android:icon="@drawable/delete"
         android:iconTint="@color/white"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 </menu>

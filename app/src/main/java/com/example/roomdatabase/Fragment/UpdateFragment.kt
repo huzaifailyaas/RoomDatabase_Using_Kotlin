@@ -18,8 +18,6 @@ import androidx.navigation.fragment.navArgs
 import com.example.roomdatabase.R
 import com.example.roomdatabase.model.StudentTable
 import com.example.roomdatabase.viewmodel.UserViewModel
-import java.nio.file.attribute.AclEntry.Builder
-
 
 @Suppress("DEPRECATION")
 class UpdateFragment : Fragment() {
@@ -86,6 +84,7 @@ class UpdateFragment : Fragment() {
 
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.delete_menu,menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
